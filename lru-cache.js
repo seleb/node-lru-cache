@@ -19,15 +19,7 @@
 
 'use strict'
 
-module.exports = LRUCache
-
-// This will be a proper iterable 'Map' in engines that support it,
-// or a fakey-fake PseudoMap in older versions.
-var Map = require('pseudomap')
-var util = require('util')
-
-// A linked list to keep track of recently-used-ness
-var Yallist = require('yallist')
+window.LRUCache = (function(){
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -240,78 +232,6 @@ LRUCache.prototype.dumpLru = function () {
   return this[LRU_LIST]
 }
 
-LRUCache.prototype.inspect = function (n, opts) {
-  var str = 'LRUCache {'
-  var extras = false
-
-  var as = this[ALLOW_STALE]
-  if (as) {
-    str += '\n  allowStale: true'
-    extras = true
-  }
-
-  var max = this[MAX]
-  if (max && max !== Infinity) {
-    if (extras) {
-      str += ','
-    }
-    str += '\n  max: ' + util.inspect(max, opts)
-    extras = true
-  }
-
-  var maxAge = this[MAX_AGE]
-  if (maxAge) {
-    if (extras) {
-      str += ','
-    }
-    str += '\n  maxAge: ' + util.inspect(maxAge, opts)
-    extras = true
-  }
-
-  var lc = this[LENGTH_CALCULATOR]
-  if (lc && lc !== naiveLength) {
-    if (extras) {
-      str += ','
-    }
-    str += '\n  length: ' + util.inspect(this[LENGTH], opts)
-    extras = true
-  }
-
-  var didFirst = false
-  this[LRU_LIST].forEach(function (item) {
-    if (didFirst) {
-      str += ',\n  '
-    } else {
-      if (extras) {
-        str += ',\n'
-      }
-      didFirst = true
-      str += '\n  '
-    }
-    var key = util.inspect(item.key).split('\n').join('\n  ')
-    var val = { value: item.value }
-    if (item.maxAge !== maxAge) {
-      val.maxAge = item.maxAge
-    }
-    if (lc !== naiveLength) {
-      val.length = item.length
-    }
-    if (isStale(this, item)) {
-      val.stale = true
-    }
-
-    val = util.inspect(val, opts).split('\n').join('\n  ')
-    str += key + ' => ' + val
-  })
-
-  if (didFirst || extras) {
-    str += '\n'
-  }
-  str += '}'
-
-  return str
-}
-
 LRUCache.prototype.set = function (key, value, maxAge) {
   maxAge = maxAge || this[MAX_AGE]
 
@@ -484,3 +404,6 @@ function Entry (key, value, length, now, maxAge) {
   this.now = now
   this.maxAge = maxAge || 0
 }
+
+return LRUCache;
+}());

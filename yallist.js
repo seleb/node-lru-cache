@@ -1,8 +1,5 @@
 'use strict'
-module.exports = Yallist
-
-Yallist.Node = Node
-Yallist.create = Yallist
+window.Yallist = (function(){
 
 function Yallist (list) {
   var self = this
@@ -370,7 +367,5 @@ function Node (value, prev, next, list) {
   }
 }
 
-try {
-  // add if support or Symbol.iterator is present
-  require('./iterator.js')
-} catch (er) {}
+return Yallist;
+}());
