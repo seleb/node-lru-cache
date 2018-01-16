@@ -223,7 +223,8 @@ window.LRUCache = (function () {
 				return {
 					k: hit.key,
 					v: hit.value,
-					e: hit.now + (hit.maxAge || 0)
+					e: hit.now + (hit.maxAge || 0),
+					l: hit.locked
 				};
 			}
 		}, this).toArray().filter(function (h) {
@@ -338,6 +339,12 @@ window.LRUCache = (function () {
 		// A previous serialized cache has the most recent items first
 		for (var l = arr.length - 1; l >= 0; l--) {
 			var hit = arr[l];
+			if(hit.l){
+				// this item was locked when dumped; just set + lock it
+				this.set(hit.k, hit.v, maxAge);
+				this.lock(hit.k);
+				continue;
+			}
 			var expiresAt = hit.e || 0;
 			if (expiresAt === 0) {
 				// the item was created without expiration in a non aged cache
