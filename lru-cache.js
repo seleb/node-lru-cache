@@ -358,6 +358,22 @@ window.LRUCache = (function () {
 		});
 	};
 
+	LRUCache.prototype.lock = function (key) {
+		var node = this[CACHE].get(key);
+		if (!node) {
+			return;
+		}
+		node.value.locked = true;
+	};
+
+	LRUCache.prototype.unlock = function (key) {
+		var node = this[CACHE].get(key);
+		if (!node) {
+			return;
+		}
+		node.value.locked = false;
+	};
+
 	function get(self, key, doUse) {
 		var hit;
 		var node = self[CACHE].get(key);
@@ -381,7 +397,7 @@ window.LRUCache = (function () {
 	}
 
 	function isStale(self, hit) {
-		if (!hit || (!hit.maxAge && !self[MAX_AGE])) {
+		if (!hit || hit.locked || (!hit.maxAge && !self[MAX_AGE])) {
 			return false;
 		}
 		var stale = false;
@@ -395,15 +411,33 @@ window.LRUCache = (function () {
 	}
 
 	function trim(self) {
-		if (self[LENGTH] > self[MAX]) {
-			for (var walker = self[LRU_LIST].tail; self[LENGTH] > self[MAX] && walker !== null;) {
-				// We know that we're about to delete this one, and also
-				// what the next least recently used key will be, so just
-				// go ahead and set it now.
-				var prev = walker.prev;
+		var walker;
+		// return early if not overflowed
+		if (self[LENGTH] <= self[MAX]) {
+			return;
+		}
+		// start trim with unlocked
+		walker = self[LRU_LIST].tail;
+		while (self[LENGTH] > self[MAX] && walker !== null) {
+			// We know that we're about to delete this one, and also
+			// what the next least recently used key will be, so just
+			// go ahead and set it now.
+			var prev = walker.prev;
+			if (!walker.value.locked) {
 				del(self, walker);
-				walker = prev;
 			}
+			walker = prev;
+		}
+		// return early if not overflowed
+		if (self[LENGTH] <= self[MAX]) {
+			return;
+		}
+		// trim locked if still needed
+		walker = self[LRU_LIST].tail;
+		while (self[LENGTH] > self[MAX] && walker !== null) {
+			var prev = walker.prev;
+			del(self, walker);
+			walker = prev;
 		}
 	}
 
@@ -426,6 +460,7 @@ window.LRUCache = (function () {
 		this.length = length;
 		this.now = now;
 		this.maxAge = maxAge || 0;
+		this.locked = false;
 	}
 
 	return LRUCache;
