@@ -367,22 +367,22 @@ window.LRUCache = (function () {
 	};
 
 	LRUCache.prototype.lock = function (key) {
-		var node = this[CACHE].get(key);
-		if (!node) {
+		var entry = getEntry(self, key, false);
+		if (!entry) {
 			return;
 		}
-		node.value.locked = true;
+		entry.locked = true;
 	};
 
 	LRUCache.prototype.unlock = function (key) {
-		var node = this[CACHE].get(key);
-		if (!node) {
+		var entry = getEntry(self, key, false);
+		if (!entry) {
 			return;
 		}
-		node.value.locked = false;
+		entry.locked = false;
 	};
 
-	function get(self, key, doUse) {
+	function getEntry(self, key, doUse) {
 		var hit;
 		var node = self[CACHE].get(key);
 		if (node) {
@@ -397,11 +397,16 @@ window.LRUCache = (function () {
 					self[LRU_LIST].unshiftNode(node);
 				}
 			}
-			if (hit) {
-				hit = hit.value;
-			}
 		}
 		return hit;
+	}
+
+	function get(self, key, doUse) {
+		var entry = getEntry(self, key, doUse);
+		if (!entry) {
+			return;
+		}
+		return entry.value;
 	}
 
 	function isStale(self, hit) {
