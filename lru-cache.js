@@ -16,18 +16,9 @@
 window.LRUCache = (function () {
 	'use strict';
 
-	// use symbols if possible, otherwise just _props
-	var hasSymbol = typeof Symbol === 'function';
-	var makeSymbol;
-	if (hasSymbol) {
-		makeSymbol = function (key) {
-			return Symbol.for(key);
-		};
-	} else {
-		makeSymbol = function (key) {
-			return '_' + key;
-		};
-	}
+	var makeSymbol = function (key) {
+		return '_' + key;
+	};
 
 	var MAX = makeSymbol('max');
 	var LENGTH = makeSymbol('length');
