@@ -382,6 +382,14 @@ window.LRUCache = (function () {
 		entry.locked = false;
 	};
 
+	LRUCache.prototype.isLocked = function (key) {
+		var entry = getEntry(self, key, false);
+		if (!entry) {
+			return;
+		}
+		return entry.locked;
+	};
+
 	function getEntry(self, key, doUse) {
 		var hit;
 		var node = self[CACHE].get(key);
