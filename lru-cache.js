@@ -286,13 +286,15 @@ window.LRUCache = (function () {
 	};
 
 	LRUCache.prototype.updateLength = function (key) {
-		var node = this[CACHE].get(key).value;
+		var value;
+		var node = this[CACHE].get(key);
 		if (!node) {
 			return;
 		}
-		var oldLength = node.length;
-		node.length = this[LENGTH_CALCULATOR](node.value, key);
-		this[LENGTH] += node.length - oldLength;
+		value = node.value;
+		var oldLength = value.length;
+		value.length = this[LENGTH_CALCULATOR](value.value, key);
+		this[LENGTH] += value.length - oldLength;
 	};
 
 	LRUCache.prototype.has = function (key) {
