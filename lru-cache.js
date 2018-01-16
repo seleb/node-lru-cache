@@ -358,7 +358,7 @@ window.LRUCache = (function () {
 	};
 
 	LRUCache.prototype.lock = function (key) {
-		var entry = getEntry(self, key, false);
+		var entry = getEntry(this, key, false);
 		if (!entry) {
 			return;
 		}
@@ -366,7 +366,7 @@ window.LRUCache = (function () {
 	};
 
 	LRUCache.prototype.unlock = function (key) {
-		var entry = getEntry(self, key, false);
+		var entry = getEntry(this, key, false);
 		if (!entry) {
 			return;
 		}
@@ -374,7 +374,7 @@ window.LRUCache = (function () {
 	};
 
 	LRUCache.prototype.isLocked = function (key) {
-		var entry = getEntry(self, key, false);
+		var entry = getEntry(this, key, false);
 		if (!entry) {
 			return;
 		}
