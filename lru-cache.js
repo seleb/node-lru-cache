@@ -295,6 +295,7 @@ window.LRUCache = (function () {
 		var oldLength = value.length;
 		value.length = this[LENGTH_CALCULATOR](value.value, key);
 		this[LENGTH] += value.length - oldLength;
+		trim(this);
 	};
 
 	LRUCache.prototype.has = function (key) {
